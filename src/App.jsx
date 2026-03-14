@@ -34,7 +34,7 @@ function normalPDF(x, mu, sigma) {
 }
 
 // ─── Bell Curve SVG ────────────────────────────────────────────────────────────
-function BellCurve({ mu, sigma, a, b, width = 500, height = 160 }) {
+function BellCurve({ mu, sigma, a, b, width = 500, height = 180 }) {
   const pts = [];
   const lo = mu - 4 * sigma;
   const hi = mu + 4 * sigma;
@@ -47,7 +47,7 @@ function BellCurve({ mu, sigma, a, b, width = 500, height = 160 }) {
   }
 
   const maxY = Math.max(...pts.map(([, y]) => y));
-  const pad = { l: 30, r: 30, t: 20, b: 30 };
+  const pad = { l: 40, r: 20, t: 20, b: 40 };
   const W = width - pad.l - pad.r;
   const H = height - pad.t - pad.b;
 
@@ -68,57 +68,162 @@ function BellCurve({ mu, sigma, a, b, width = 500, height = 160 }) {
   }
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ fontFamily: "'DM Mono', monospace" }}>
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
       <defs>
         <linearGradient id="shadeGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.1" />
+          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#6366f1" stopOpacity="0.05" />
+        </linearGradient>
+        <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#6366f1" />
+          <stop offset="100%" stopColor="#8b5cf6" />
         </linearGradient>
       </defs>
+
       {/* Grid lines */}
       {[0.25, 0.5, 0.75, 1].map((f) => (
-        <line key={f} x1={pad.l} x2={pad.l + W} y1={sy(maxY * f)} y2={sy(maxY * f)}
-          stroke="#1e3a4a" strokeWidth="0.5" strokeDasharray="3,3" />
+        <line
+          key={f}
+          x1={pad.l}
+          x2={pad.l + W}
+          y1={sy(maxY * f)}
+          y2={sy(maxY * f)}
+          stroke="#e2e8f0"
+          strokeWidth="0.5"
+          strokeDasharray="4,4"
+          opacity="0.3"
+        />
       ))}
+
       {/* Shaded area */}
       {shadePath && <path d={shadePath} fill="url(#shadeGrad)" />}
+
       {/* Curve */}
-      <path d={pathAll} fill="none" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" />
+      <path
+        d={pathAll}
+        fill="none"
+        stroke="url(#curveGrad)"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+
       {/* Axis */}
-      <line x1={pad.l} x2={pad.l + W} y1={sy(0)} y2={sy(0)} stroke="#334155" strokeWidth="1" />
-      {/* μ label */}
-      <text x={sx(mu)} y={sy(0) + 16} textAnchor="middle" fontSize="10" fill="#64748b">μ={mu}</text>
+      <line
+        x1={pad.l}
+        x2={pad.l + W}
+        y1={sy(0)}
+        y2={sy(0)}
+        stroke="#cbd5e1"
+        strokeWidth="1.5"
+      />
+
+      {/* μ marker */}
+      <circle cx={sx(mu)} cy={sy(0)} r="4" fill="#6366f1" stroke="white" strokeWidth="2" />
+      <text
+        x={sx(mu)}
+        y={sy(0) + 22}
+        textAnchor="middle"
+        fontSize="11"
+        fill="#1e293b"
+        fontWeight="500"
+      >
+        μ = {mu.toFixed(1)}
+      </text>
+
       {/* a, b markers */}
       {a > lo && a < hi && (
         <>
-          <line x1={sx(a)} x2={sx(a)} y1={sy(0)} y2={sy(normalPDF(a, mu, sigma))} stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4,2" />
-          <text x={sx(a)} y={sy(0) + 16} textAnchor="middle" fontSize="10" fill="#f59e0b">{a}</text>
+          <line
+            x1={sx(a)}
+            x2={sx(a)}
+            y1={sy(0)}
+            y2={sy(normalPDF(a, mu, sigma))}
+            stroke="#f97316"
+            strokeWidth="2"
+            strokeDasharray="6,4"
+          />
+          <circle cx={sx(a)} cy={sy(normalPDF(a, mu, sigma))} r="4" fill="#f97316" stroke="white" strokeWidth="2" />
+          <text
+            x={sx(a)}
+            y={sy(normalPDF(a, mu, sigma)) - 12}
+            textAnchor="middle"
+            fontSize="11"
+            fill="#f97316"
+            fontWeight="600"
+          >
+            a = {a}
+          </text>
         </>
       )}
       {b > lo && b < hi && (
         <>
-          <line x1={sx(b)} x2={sx(b)} y1={sy(0)} y2={sy(normalPDF(b, mu, sigma))} stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4,2" />
-          <text x={sx(b)} y={sy(0) + 16} textAnchor="middle" fontSize="10" fill="#f59e0b">{b}</text>
+          <line
+            x1={sx(b)}
+            x2={sx(b)}
+            y1={sy(0)}
+            y2={sy(normalPDF(b, mu, sigma))}
+            stroke="#f97316"
+            strokeWidth="2"
+            strokeDasharray="6,4"
+          />
+          <circle cx={sx(b)} cy={sy(normalPDF(b, mu, sigma))} r="4" fill="#f97316" stroke="white" strokeWidth="2" />
+          <text
+            x={sx(b)}
+            y={sy(normalPDF(b, mu, sigma)) - 12}
+            textAnchor="middle"
+            fontSize="11"
+            fill="#f97316"
+            fontWeight="600"
+          >
+            b = {b}
+          </text>
         </>
       )}
     </svg>
   );
 }
 
-// ─── Step display ──────────────────────────────────────────────────────────────
-function Step({ num, label, children }) {
+// ─── Step Card ─────────────────────────────────────────────────────────────────
+function StepCard({ number, title, children, icon }) {
   return (
-    <div className="flex gap-3 items-start">
-      <div style={{
-        width: 28, height: 28, borderRadius: "50%",
-        background: "linear-gradient(135deg,#0ea5e9,#6366f1)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, margin: "5px auto"
-      }}>{num}</div>
-      <div className="flex-1">
-        <div style={{ color: "#94a3b8", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>{label}</div>
-        <div style={{ color: "#e2e8f0", fontSize: 13, lineHeight: 1.7 }}>{children}</div>
+    <div className="step-card">
+      <div className="step-header">
+        <span className="step-number">{number}</span>
+        <span className="step-title">{title}</span>
       </div>
+      <div className="step-content">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── Input Group ───────────────────────────────────────────────────────────────
+function InputGroup({ label, value, onChange, min, max, step = 1, unit = "" }) {
+  return (
+    <div className="input-group">
+      <label>{label}</label>
+      <div className="input-wrapper">
+        <input
+          type="number"
+          value={value}
+          step={step}
+          min={min}
+          max={max}
+          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        />
+        {unit && <span className="input-unit">{unit}</span>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Result Badge ──────────────────────────────────────────────────────────────
+function ResultBadge({ label, value, color = "primary" }) {
+  return (
+    <div className={`result-badge ${color}`}>
+      <span className="result-label">{label}</span>
+      <span className="result-value">{value}</span>
     </div>
   );
 }
@@ -144,60 +249,74 @@ function PartA() {
 
   const fmt = (n) => n.toFixed(4);
   const fmtZ = (n) => (n >= 0 ? "+" : "") + n.toFixed(4);
+  const fmtPercent = (n) => (n * 100).toFixed(2);
 
   return (
-    <div>
-      <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 16 }}>
-        Soit <b style={{ color: "#38bdf8" }}>X ~ N(μ, σ²)</b>. Calculer <b style={{ color: "#f59e0b" }}>P[a &lt; X &lt; b]</b>.
+    <>
+      <p className="part-description">
+        Calculez la probabilité qu'une variable aléatoire <strong>X ~ N(μ, σ²)</strong>
+        se trouve dans un intervalle <strong>[a, b]</strong>.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-        {[
-          { label: "Moyenne μ", val: mu, set: setMu, min: -100, max: 100 },
-          { label: "Variance σ²", val: variance, set: setVariance, min: 0.1, max: 100, step: 0.1 },
-          { label: "Borne gauche a", val: a, set: setA, min: -100, max: 100 },
-          { label: "Borne droite b", val: b, set: setB, min: -100, max: 100 },
-        ].map(({ label, val, set, min, max, step = 1 }) => (
-          <label key={label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <span style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</span>
-            <input type="number" value={val} step={step} min={min} max={max}
-              onChange={(e) => set(parseFloat(e.target.value) || 0)}
-              style={{
-                background: "#0f1f2e", border: "1px solid #1e3a4a", borderRadius: 8,
-                color: "#e2e8f0", padding: "8px 12px", fontSize: 14,
-                outline: "none", width: "100%"
-              }} />
-          </label>
-        ))}
-      </div>
-
-      {/* Bell curve */}
-      <div style={{ background: "#0a1828", borderRadius: 12, padding: 12, marginBottom: 16 }}>
-        <BellCurve mu={mu} sigma={sigma} a={a} b={b} />
-      </div>
-
-      {result && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <Step num="1" label="Standardisation">
-            Z = (X − μ) / σ = (X − {mu}) / {fmt(sigma)}<br />
-            z₁ = ({a} − {mu}) / {fmt(sigma)} = <b style={{ color: "#f59e0b" }}>{fmtZ(result.za)}</b><br />
-            z₂ = ({b} − {mu}) / {fmt(sigma)} = <b style={{ color: "#f59e0b" }}>{fmtZ(result.zb)}</b>
-          </Step>
-          <Step num="2" label="Table de la loi normale">
-            Φ({fmtZ(result.zb)}) = <b style={{ color: "#38bdf8" }}>{fmt(result.phiB)}</b><br />
-            Φ({fmtZ(result.za)}) = <b style={{ color: "#38bdf8" }}>{fmt(result.phiA)}</b>
-          </Step>
-          <Step num="3" label="Résultat">
-            P[{a} &lt; X &lt; {b}] = Φ({fmtZ(result.zb)}) − Φ({fmtZ(result.za)})<br />
-            = {fmt(result.phiB)} − {fmt(result.phiA)}<br />
-            = <b style={{ color: "#4ade80", fontSize: 18 }}>{fmt(result.prob)}</b>
-            <span style={{ marginLeft: 8, color: "#94a3b8", fontSize: 12 }}>
-              soit {(result.prob * 100).toFixed(2)} %
-            </span>
-          </Step>
+      <div className="part-container">
+        <div className="inputs-grid">
+          <InputGroup label="Moyenne (μ)" value={mu} onChange={setMu} min={-100} max={100} />
+          <InputGroup label="Variance (σ²)" value={variance} onChange={setVariance} min={0.1} max={100} step={0.1} />
+          <InputGroup label="Borne inférieure (a)" value={a} onChange={setA} min={-100} max={100} />
+          <InputGroup label="Borne supérieure (b)" value={b} onChange={setB} min={-100} max={100} />
         </div>
-      )}
-    </div>
+
+        <div className="curve-container">
+          <BellCurve mu={mu} sigma={sigma} a={a} b={b} />
+        </div>
+
+        {result && (
+          <div className="steps-container">
+            <StepCard number="1" title="Standardisation">
+              <div className="step-formula">
+                <span>Z = (X − μ) / σ = (X − {mu}) / {fmt(sigma)}</span>
+                <div className="formula-row">
+                  <span>z₁ = ({a} − {mu}) / {fmt(sigma)} =</span>
+                  <strong className="text-accent">{fmtZ(result.za)}</strong>
+                </div>
+                <div className="formula-row">
+                  <span>z₂ = ({b} − {mu}) / {fmt(sigma)} =</span>
+                  <strong className="text-accent">{fmtZ(result.zb)}</strong>
+                </div>
+              </div>
+            </StepCard>
+
+            <StepCard number="2" title="Table de la loi normale">
+              <div className="step-formula">
+                <div className="formula-row">
+                  <span>Φ({fmtZ(result.zb)}) =</span>
+                  <strong className="text-primary">{fmt(result.phiB)}</strong>
+                </div>
+                <div className="formula-row">
+                  <span>Φ({fmtZ(result.za)}) =</span>
+                  <strong className="text-primary">{fmt(result.phiA)}</strong>
+                </div>
+              </div>
+            </StepCard>
+
+            <StepCard number="3" title="Résultat">
+              <div className="step-formula">
+                <div className="formula-row">
+                  <span>P[{a} &lt; X &lt; {b}] = Φ({fmtZ(result.zb)}) − Φ({fmtZ(result.za)})</span>
+                </div>
+                <div className="formula-row">
+                  <span>= {fmt(result.phiB)} − {fmt(result.phiA)}</span>
+                </div>
+                <div className="result-row">
+                  <span className="result-value-large">{fmt(result.prob)}</span>
+                  <span className="result-percent">({fmtPercent(result.prob)}%)</span>
+                </div>
+              </div>
+            </StepCard>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -212,9 +331,6 @@ function PartB() {
   const calculate = () => {
     const z1 = phiInverse(p1);
     const z2 = phiInverse(p2);
-    // x1 = mu + z1*sigma  =>  mu + z1*sigma = x1
-    // x2 = mu + z2*sigma  =>  mu + z2*sigma = x2
-    // Subtracting: (z2 - z1)*sigma = x2 - x1
     const sigma = (x2 - x1) / (z2 - z1);
     const mu = x1 - z1 * sigma;
     setResult({ z1, z2, mu, sigma, sigma2: sigma * sigma });
@@ -225,151 +341,504 @@ function PartB() {
   const fmt = (n) => n.toFixed(4);
   const fmtZ = (n) => (n >= 0 ? "+" : "") + n.toFixed(4);
 
+  if (!result || isNaN(result.mu) || !isFinite(result.mu) || result.sigma <= 0) {
+    return (
+      <div className="part-container">
+        <p className="part-description">
+          Déterminez les paramètres <strong>μ</strong> et <strong>σ</strong> d'une loi normale
+          à partir de deux probabilités cumulées connues.
+        </p>
+        <div className="inputs-grid">
+          <InputGroup label="x₁" value={x1} onChange={setX1} />
+          <InputGroup label="P[Y < x₁]" value={p1} onChange={setP1} min={0.0001} max={0.9999} step={0.0001} />
+          <InputGroup label="x₂" value={x2} onChange={setX2} />
+          <InputGroup label="P[Y < x₂]" value={p2} onChange={setP2} min={0.0001} max={0.9999} step={0.0001} />
+        </div>
+        <div className="error-message">
+          Les valeurs saisies ne permettent pas de déterminer une loi normale valide.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 16 }}>
-        Déterminer <b style={{ color: "#38bdf8" }}>μ</b> et <b style={{ color: "#38bdf8" }}>σ</b> d'une loi normale Y à partir de deux probabilités connues.
+    <>
+      <p className="part-description">
+        Déterminez les paramètres <strong>μ</strong> et <strong>σ</strong> d'une loi normale
+        à partir de deux probabilités cumulées connues.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-        {[
-          { label: "x₁", val: x1, set: setX1 },
-          { label: "P[Y < x₁]", val: p1, set: setP1, step: 0.0001, min: 0.0001, max: 0.9999 },
-          { label: "x₂", val: x2, set: setX2 },
-          { label: "P[Y < x₂]", val: p2, set: setP2, step: 0.0001, min: 0.0001, max: 0.9999 },
-        ].map(({ label, val, set, step = 1, min = -1000, max = 1000 }) => (
-          <label key={label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <span style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</span>
-            <input type="number" value={val} step={step} min={min} max={max}
-              onChange={(e) => set(parseFloat(e.target.value) || 0)}
-              style={{
-                background: "#0f1f2e", border: "1px solid #1e3a4a", borderRadius: 8,
-                color: "#e2e8f0", padding: "8px 12px", fontSize: 14, outline: "none", width: "100%"
-              }} />
-          </label>
-        ))}
-      </div>
+      <div className="part-container">
+        <div className="inputs-grid">
+          <InputGroup label="x₁" value={x1} onChange={setX1} />
+          <InputGroup label="P[Y < x₁]" value={p1} onChange={setP1} min={0.0001} max={0.9999} step={0.0001} />
+          <InputGroup label="x₂" value={x2} onChange={setX2} />
+          <InputGroup label="P[Y < x₂]" value={p2} onChange={setP2} min={0.0001} max={0.9999} step={0.0001} />
+        </div>
 
-      {result && !isNaN(result.mu) && isFinite(result.mu) && result.sigma > 0 && (
-        <div>
-          <div style={{ background: "#0a1828", borderRadius: 12, padding: 12, marginBottom: 16 }}>
-            <BellCurve mu={result.mu} sigma={result.sigma} a={x1} b={x2} />
-          </div>
+        <div className="curve-container">
+          <BellCurve mu={result.mu} sigma={result.sigma} a={x1} b={x2} />
+        </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <Step num="1" label="Trouver z₁ et z₂ via Φ⁻¹">
-              Φ(z₁) = {p1} → z₁ = Φ⁻¹({p1}) = <b style={{ color: "#f59e0b" }}>{fmtZ(result.z1)}</b><br />
-              Φ(z₂) = {p2} → z₂ = Φ⁻¹({p2}) = <b style={{ color: "#f59e0b" }}>{fmtZ(result.z2)}</b>
-            </Step>
-            <Step num="2" label="Système d'équations">
-              <span style={{ color: "#c084fc" }}>
-                ( {x1} − μ ) / σ = {fmtZ(result.z1)}<br />
-                ( {x2} − μ ) / σ = {fmtZ(result.z2)}
-              </span>
-            </Step>
-            <Step num="3" label="Résolution">
-              σ = ({x2} − {x1}) / ({fmtZ(result.z2)} − {fmtZ(result.z1)}) = <b style={{ color: "#38bdf8" }}>{fmt(result.sigma)}</b><br />
-              μ = {x1} − ({fmtZ(result.z1)}) × {fmt(result.sigma)} = <b style={{ color: "#38bdf8" }}>{fmt(result.mu)}</b>
-            </Step>
-            <div style={{
-              background: "linear-gradient(135deg, #0f2d1a, #0a1828)",
-              border: "1px solid #16a34a", borderRadius: 12, padding: 16,
-              display: "flex", gap: 32, justifyContent: "center", marginTop: 4
-            }}>
-              <div style={{ textAlign: "center" }}>
-                <div style={{ color: "#64748b", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Moyenne</div>
-                <div style={{ color: "#4ade80", fontSize: 28, fontWeight: 800 }}>μ = {fmt(result.mu)}</div>
+        <div className="steps-container">
+          <StepCard number="1" title="Trouver z₁ et z₂">
+            <div className="step-formula">
+              <div className="formula-row">
+                <span>Φ(z₁) = {p1} → z₁ = Φ⁻¹({p1}) =</span>
+                <strong className="text-accent">{fmtZ(result.z1)}</strong>
               </div>
-              <div style={{ width: 1, background: "#1e3a4a" }} />
-              <div style={{ textAlign: "center" }}>
-                <div style={{ color: "#64748b", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Écart-type</div>
-                <div style={{ color: "#4ade80", fontSize: 28, fontWeight: 800 }}>σ = {fmt(result.sigma)}</div>
-              </div>
-              <div style={{ width: 1, background: "#1e3a4a" }} />
-              <div style={{ textAlign: "center" }}>
-                <div style={{ color: "#64748b", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Variance</div>
-                <div style={{ color: "#4ade80", fontSize: 28, fontWeight: 800 }}>σ² = {fmt(result.sigma2)}</div>
+              <div className="formula-row">
+                <span>Φ(z₂) = {p2} → z₂ = Φ⁻¹({p2}) =</span>
+                <strong className="text-accent">{fmtZ(result.z2)}</strong>
               </div>
             </div>
-          </div>
+          </StepCard>
+
+          <StepCard number="2" title="Système d'équations">
+            <div className="step-formula">
+              <div className="formula-row">
+                <span>({x1} − μ) / σ = {fmtZ(result.z1)}</span>
+              </div>
+              <div className="formula-row">
+                <span>({x2} − μ) / σ = {fmtZ(result.z2)}</span>
+              </div>
+            </div>
+          </StepCard>
+
+          <StepCard number="3" title="Résolution">
+            <div className="step-formula">
+              <div className="formula-row">
+                <span>σ = ({x2} − {x1}) / ({fmtZ(result.z2)} − {fmtZ(result.z1)}) =</span>
+                <strong className="text-primary">{fmt(result.sigma)}</strong>
+              </div>
+              <div className="formula-row">
+                <span>μ = {x1} − ({fmtZ(result.z1)}) × {fmt(result.sigma)} =</span>
+                <strong className="text-primary">{fmt(result.mu)}</strong>
+              </div>
+            </div>
+          </StepCard>
         </div>
-      )}
-    </div>
+
+        <div className="results-grid">
+          <ResultBadge label="Moyenne (μ)" value={fmt(result.mu)} color="success" />
+          <ResultBadge label="Écart-type (σ)" value={fmt(result.sigma)} color="success" />
+          <ResultBadge label="Variance (σ²)" value={fmt(result.sigma2)} color="success" />
+        </div>
+      </div>
+    </>
   );
 }
 
 export default function App() {
-
   const [tab, setTab] = useState("a");
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "radial-gradient(ellipse at top, #0c1e30 0%, #060d14 100%)",
-      fontFamily: "'DM Mono', 'Courier New', monospace",
-      color: "#e2e8f0",
-      padding: "24px 16px"
-    }}>
+    <div className="app">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        input[type=number]::-webkit-inner-spin-button { opacity: 1; }
-        input:focus { border-color: #0ea5e9 !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          background: #f8fafc;
+        }
+
+        .app {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          display: flex;
+        }
+
+        /* Sidebar navigation */
+        .sidebar {
+          width: 230px;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-right: 1px solid rgba(255, 255, 255, 0.2);
+          padding: 2rem 1rem;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .sidebar-header {
+          margin-bottom: 2rem;
+          padding: 0 1rem;
+        }
+
+        .sidebar-header h1 {
+          font-size: 1.5rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 0.25rem;
+          letter-spacing: -0.02em;
+        }
+
+        .sidebar-header p {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 0.75rem;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        .nav-tabs {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          flex: 1;
+        }
+
+        .nav-tab {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          border: none;
+          border-radius: 1rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+          font-family: inherit;
+          cursor: pointer;
+          transition: all 0.2s;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.7);
+          text-align: left;
+          width: 100%;
+        }
+
+        .nav-tab:hover {
+          background: rgba(255, 255, 255, 0.15);
+          color: white;
+        }
+
+        .nav-tab.active {
+          background: white;
+          color: #667eea;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab span:last-child {
+          flex: 1;
+        }
+
+        /* Main content */
+        .main-content {
+          flex: 1;
+          padding: 2rem;
+          overflow-y: auto;
+        }
+
+        .part-container {
+          background: white;
+          border-radius: 1.5rem;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .part-description {
+          color: #fff;
+          font-size: 1.2rem;
+          padding-bottom: 1rem;
+        }
+
+        .part-description strong {
+          color: #667eea;
+          font-weight: 600;
+        }
+
+        .inputs-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+        }
+
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .input-group label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #94a3b8;
+        }
+
+        .input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .input-wrapper input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border: 2px solid #e2e8f0;
+          border-radius: 0.75rem;
+          font-size: 1rem;
+          font-weight: 500;
+          font-family: inherit;
+          transition: all 0.2s;
+          background: white;
+          color: #1e293b;
+        }
+
+        .input-wrapper input:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-unit {
+          position: absolute;
+          right: 1rem;
+          color: #94a3b8;
+          font-size: 0.875rem;
+          font-weight: 500;
+          pointer-events: none;
+        }
+
+        .curve-container {
+          background: #f8fafc;
+          border-radius: 1rem;
+          padding: 1.5rem;
+          border: 2px solid #e2e8f0;
+        }
+
+        .steps-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .step-card {
+          background: #f8fafc;
+          border-radius: 1rem;
+          padding: 1.25rem;
+          border: 2px solid #e2e8f0;
+        }
+
+        .step-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+        }
+
+        .step-number {
+          width: 2rem;
+          height: 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          font-weight: 700;
+          font-size: 0.875rem;
+          border-radius: 0.5rem;
+        }
+
+        .step-title {
+          font-weight: 600;
+          color: #1e293b;
+          text-transform: uppercase;
+          font-size: 0.75rem;
+          letter-spacing: 0.05em;
+        }
+
+        .step-content {
+          color: #475569;
+          font-size: 0.9375rem;
+        }
+
+        .step-formula {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .formula-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .formula-row:last-child {
+          border-bottom: none;
+        }
+
+        .text-primary {
+          color: #667eea;
+          font-weight: 600;
+        }
+
+        .text-accent {
+          color: #f97316;
+          font-weight: 600;
+        }
+
+        .result-row {
+          display: flex;
+          align-items: baseline;
+          gap: 1rem;
+          margin-top: 0.5rem;
+          padding-top: 0.5rem;
+          border-top: 2px solid #e2e8f0;
+        }
+
+        .result-value-large {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #10b981;
+        }
+
+        .result-percent {
+          color: #94a3b8;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+
+        .results-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+          margin-top: 1rem;
+        }
+
+        .result-badge {
+          background: #f8fafc;
+          border-radius: 1rem;
+          padding: 1rem;
+          text-align: center;
+          border: 2px solid #e2e8f0;
+        }
+
+        .result-badge.success {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          border-color: transparent;
+        }
+
+        .result-badge.success .result-label,
+        .result-badge.success .result-value {
+          color: white;
+        }
+
+        .result-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #94a3b8;
+          margin-bottom: 0.25rem;
+        }
+
+        .result-value {
+          display: block;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #1e293b;
+        }
+
+        .error-message {
+          background: #fee2e2;
+          color: #ef4444;
+          padding: 1rem;
+          border-radius: 0.75rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          text-align: center;
+          border: 2px solid #fecaca;
+        }
+
+        @media (max-width: 768px) {
+          .app {
+            flex-direction: column;
+          }
+          
+          .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+          }
+          
+          .sidebar-header {
+            margin-bottom: 1rem;
+          }
+          
+          .nav-tabs {
+            flex-direction: row;
+          }
+          
+          .nav-tab {
+            padding: 0.75rem;
+            justify-content: center;
+          }
+          
+          .nav-tab span:last-child {
+            display: none;
+          }
+          
+          .main-content {
+            padding: 1rem;
+          }
+
+          .inputs-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .results-grid {
+            grid-template-columns: 1fr;
+          }
+        }
       `}</style>
 
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{
-          marginBottom: 28,
-          borderBottom: "1px solid #1e3a4a",
-          paddingBottom: 20
-        }}>
-          <h1 style={{
-            fontSize: 32,
-            fontWeight: 800,
-            color: "#f8fafc",
-            textTransform: "uppercase"
-          }}>Loi Normale</h1>
-          <p style={{ color: "#1f2a3a", fontSize: 12, marginTop: 6 }}>
-            Calculateur interactif — N(μ, σ²)
-          </p>
+      {/* Sidebar Navigation */}
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h1>Loi Normale</h1>
+          <p>Calculateur</p>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-          {[
-            { id: "a", label: "P[a < X < b]" },
-            { id: "b", label: "Trouver μ & σ" },
-          ].map(({ id, label }) => (
-            <button key={id} onClick={() => setTab(id)} style={{
-              flex: 1, padding: "10px 16px", borderRadius: 10, border: "none",
-              cursor: "pointer", fontSize: 12, fontFamily: "'DM Mono', monospace",
-              fontWeight: 500, transition: "all 0.2s",
-              background: tab === id
-                ? "linear-gradient(135deg, #0ea5e9, #6366f1)"
-                : "#0f1f2e",
-              color: tab === id ? "#fff" : "#64748b",
-              boxShadow: tab === id ? "0 0 20px #0ea5e940" : "none"
-            }}>{label}</button>
-          ))}
+        <div className="nav-tabs">
+          <button
+            className={`nav-tab ${tab === "a" ? "active" : ""}`}
+            onClick={() => setTab("a")}
+          >
+            <span>P[a &lt; X &lt; b]</span>
+          </button>
+          <button
+            className={`nav-tab ${tab === "b" ? "active" : ""}`}
+            onClick={() => setTab("b")}
+          >
+            <span>Trouver μ & σ</span>
+          </button>
         </div>
+      </div>
 
-        {/* Content card */}
-        <div style={{
-          background: "rgba(15,31,46,0.8)", borderRadius: 16,
-          border: "1px solid #1e3a4a", padding: 24,
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 4px 40px rgba(0,0,0,0.5)"
-        }}>
+      {/* Main Content */}
+      <div className="main-content">
+        <div className="content-card">
           {tab === "a" ? <PartA /> : <PartB />}
-        </div>
-
-        {/* Footer */}
-        <div style={{ textAlign: "center", marginTop: 20, color: "#1e3a4a", fontSize: 11 }}>
-          Probabilités calculées via la fonction Φ (loi normale standard)
         </div>
       </div>
     </div>
   );
 }
-
