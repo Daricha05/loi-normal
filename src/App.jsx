@@ -822,13 +822,13 @@ export default function App() {
             className={`nav-tab ${tab === "a" ? "active" : ""}`}
             onClick={() => setTab("a")}
           >
-            <span>P[a &lt; X &lt; b]</span>
+            <span>Probabilité d'Intervalle</span>
           </button>
           <button
             className={`nav-tab ${tab === "b" ? "active" : ""}`}
             onClick={() => setTab("b")}
           >
-            <span>Trouver μ & σ</span>
+            <span>Estimation de μ et σ</span>
           </button>
         </div>
       </div>
